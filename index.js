@@ -1,27 +1,26 @@
 const express  = require('express');
-const app = express();
-const keys = require('./config/keys')
-require('./routes/authRoutes')(app);
+const keys = require('./config/keys');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const cookiesSession = require('cookie-session');
+
 // models
 require('./models/User')
-
 // passport
 require("./services/passport");
 
-const mongoose = require('mongoose')
+const app = express();
 
-mongoose.connect(keys.mongodbURI,
-    {useUnifiedTopology: true });
+require('./routes/authRoutes')(app);
 
+app.use(cookiesSession({
+    maxAge: 30*24*60*60*1000,
+    keys:[keys.cookieKey]
+}))
+app.use(passport.initialize());
+app.use(passport.session());
 
-// const MongoClient = require('mongodb').MongoClient;
-// const uri = "mongodb+srv://emaily_dev:<password>@testingnodereactapp.5lj4w.gcp.mongodb.net/<dbname>?retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true });
-// client.connect(err => {
-//     const collection = client.db("test").collection("devices");
-//     // perform actions on the collection object
-//     client.close();
-// });
+mongoose.connect(keys.mongodbURI,{useUnifiedTopology: true });
 
 const PORT = process.env.PORT || 3001;
 
