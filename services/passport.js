@@ -17,23 +17,17 @@ passport.use(
     new GoogleStrategy({
         clientID: keys.googleClientID,
         clientSecret: keys.googleClientSecret,
-        callbackURL: '/auth/google/callback'
-    },(accessToken, refreshToken, profile, done)=>{
-        User.findOne({googleId: profile.id})
-            .then((existingUser)=>{
-                if (existingUser){
-                    // we don't create any user into mongoDB
-                    done(null,existingUser)
-                }else {
-                    // we create any user into mongoDB
-                    new User({googleId: profile.id}).save()
-                    .then(newUser => done(null,newUser));
-                }
-            })
-        console.log("accessToken ==>",accessToken);
-        console.log("refresh Token ==>",refreshToken);
-        console.log("Profile ==>",profile);
-        console.log("done  ==>",done);
+        callbackURL: '/auth/google/callback',
+        proxy: true
+    },
+    async (accessToken, refreshToken, profile, done)=>{
+        const existingUser = await User.findOne({googleId: profile.id})
+      if (existingUser) return done(null, existingUser)
+        // we create any user into mongoDB
+        const user = await  new User({googleId: profile.id}).save()
+        done(null, newUser);
+        // .then(newUser =>done(null,newUser));
+        
     })
 );
 
