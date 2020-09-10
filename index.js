@@ -3,6 +3,8 @@ const keys = require('./config/keys');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const cookiesSession = require('cookie-session');
+var cors = require('cors')
+
 
 // models
 require('./models/User')
@@ -11,6 +13,7 @@ require("./services/passport");
 
 const app = express();
 
+app.use(cors()) // Use this after the variable declaration
 app.use(cookiesSession({
     maxAge: 30*24*60*60*1000,
     keys:[keys.cookieKey]
